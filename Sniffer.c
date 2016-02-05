@@ -1,9 +1,9 @@
 /*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- */
+*  This program is free software: you can redistribute it and/or modify
+*  it under the terms of the GNU General Public License as published by
+*  the Free Software Foundation, either version 3 of the License, or
+*  (at your option) any later version.
+*/
 
 #include <arpa/inet.h>
 #include <linux/if_packet.h>
@@ -16,35 +16,45 @@
 #include <sys/socket.h>
 #include <net/if.h>
 #include <netinet/ether.h>
- #include <unistd.h>
+#include <unistd.h>
 
 //For through WIFI
-// #define DEST_MAC0	0x54
-// #define DEST_MAC1	0x35
-// #define DEST_MAC2	0x30
-// #define DEST_MAC3	0x85
-// #define DEST_MAC4	0x61
-// #define DEST_MAC5	0xa3
+#define HOME_MAC0	0x54
+#define HOME_MAC1	0x35
+#define HOME_MAC2	0x30
+#define HOME_MAC3	0x85
+#define HOME_MAC4	0x61
+#define HOME_MAC5	0xa3
 
 //For through eth0
-#define HOME_MAC0	0x78
-#define HOME_MAC1	0x24
-#define HOME_MAC2	0xaf
-#define HOME_MAC3	0x10
-#define HOME_MAC4	0x34
-#define HOME_MAC5	0x44
+// #define HOME_MAC0	0x78
+// #define HOME_MAC1	0x24
+// #define HOME_MAC2	0xaf
+// #define HOME_MAC3	0x10
+// #define HOME_MAC4	0x34
+// #define HOME_MAC5	0x44
 
+
+//ON ETHERNET
+// #define MY_DEST_MAC0	0x00
+// #define MY_DEST_MAC1	0x1b
+// #define MY_DEST_MAC2	0x24
+// #define MY_DEST_MAC3	0x07
+// #define MY_DEST_MAC4	0x57
+// #define MY_DEST_MAC5	0x9e
+
+//ON WIFI
 #define MY_DEST_MAC0	0x00
-#define MY_DEST_MAC1	0x1b
-#define MY_DEST_MAC2	0x24
-#define MY_DEST_MAC3	0x07
-#define MY_DEST_MAC4	0x57
-#define MY_DEST_MAC5	0x9e
+#define MY_DEST_MAC1	0x19
+#define MY_DEST_MAC2	0x7e
+#define MY_DEST_MAC3	0x24
+#define MY_DEST_MAC4	0xe4
+#define MY_DEST_MAC5	0x0c
 
 #define ETHER_TYPE	0x0800
 
-#define DEFAULT_IF	"eth0"
-// #define DEFAULT_IF	"wlan0"
+ // #define DEFAULT_IF	"eth0" 
+#define DEFAULT_IF	"wlan0"
 #define BUF_SIZ		1024
 
 void sendPacket(long, long, long, long, long, long, char*);
@@ -149,7 +159,6 @@ int recievePacket(){
 	struct sockaddr_storage their_addr;
 	uint8_t buf[BUF_SIZ];
 	char ifName[IFNAMSIZ];
-	
 	/* Get interface name */
 	// if (argc > 1)
 		// strcpy(ifName, argv[1]);
@@ -164,7 +173,7 @@ int recievePacket(){
 	memset(&if_ip, 0, sizeof(struct ifreq));
 
 	/* Open PF_PACKET socket, listening for EtherType ETHER_TYPE */
-	if ((sockfd = socket(PF_PACKET, SOCK_RAW, htons(ETHER_TYPE))) == -1) {
+	if ((sockfd = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL))) == -1) {
 		perror("listener: socket");	
 		return -1;
 	}
@@ -186,6 +195,12 @@ int recievePacket(){
 		close(sockfd);
 		exit(EXIT_FAILURE);
 	}
+	ifopts.ifr_flags |= IFF_PROMISC;
+	if( ioctl(sockfd, SIOCSIFFLAGS, &ifopts) != 0 )
+	{
+		perror("ERROR SETTING PROMISCOUS");
+	    // handle error here
+	}
 	while(1){
 	
 		// printf("listener: Waiting to recvfrom...\n");
@@ -202,7 +217,7 @@ int recievePacket(){
 			printf("\nCorrect destination MAC address\n");
 			printf("\tlistener: got packet %zd bytes\n", numbytes);
 		} else {
-			printf("Wrong destination MAC: %x:%x:%x:%x:%x:%x\n",
+			printf("Wrong destination MAC: %02x:%02x:%02x:%02x:%02x:%02x\n",
 							eh->ether_dhost[0],
 							eh->ether_dhost[1],
 							eh->ether_dhost[2],
