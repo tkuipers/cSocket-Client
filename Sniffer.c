@@ -55,6 +55,9 @@
 
  // #define DEFAULT_IF	"eth0" 
 #define DEFAULT_IF	"wlan0"
+// #define DEFAULT_IF	"enp3s0f2"
+// #define DEFAULT_IF  "wlp2s0f0"
+
 #define BUF_SIZ		1024
 
 void sendPacket(long, long, long, long, long, long, char*);
