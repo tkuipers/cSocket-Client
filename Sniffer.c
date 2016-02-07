@@ -19,45 +19,39 @@
 #include <unistd.h>
 
 //For through WIFI
-#define HOME_MAC0	0x54
-#define HOME_MAC1	0x35
-#define HOME_MAC2	0x30
-#define HOME_MAC3	0x85
-#define HOME_MAC4	0x61
-#define HOME_MAC5	0xa3
+// #define HOME_MAC0	0x54
+// #define HOME_MAC1	0x35
+// #define HOME_MAC2	0x30
+// #define HOME_MAC3	0x85
+// #define HOME_MAC4	0x61
+// #define HOME_MAC5	0xa3
+// #define MY_MAC0	0x00
+// #define MY_MAC1	0x19
+// #define MY_MAC2	0x7e
+// #define MY_MAC3	0x24
+// #define MY_MAC4	0xe4
+// #define MY_MAC5	0x0c
 
 //For through eth0
-// #define HOME_MAC0	0x78
-// #define HOME_MAC1	0x24
-// #define HOME_MAC2	0xaf
-// #define HOME_MAC3	0x10
-// #define HOME_MAC4	0x34
-// #define HOME_MAC5	0x44
-
-
-//ON ETHERNET
-// #define MY_DEST_MAC0	0x00
-// #define MY_DEST_MAC1	0x1b
-// #define MY_DEST_MAC2	0x24
-// #define MY_DEST_MAC3	0x07
-// #define MY_DEST_MAC4	0x57
-// #define MY_DEST_MAC5	0x9e
+#define HOME_MAC0	0x78
+#define HOME_MAC1	0x24
+#define HOME_MAC2	0xaf
+#define HOME_MAC3	0x10
+#define HOME_MAC4	0x34
+#define HOME_MAC5	0x44
+#define MY_MAC0	0x00
+#define MY_MAC1	0x1b
+#define MY_MAC2	0x24
+#define MY_MAC3	0x07
+#define MY_MAC4	0x57
+#define MY_MAC5	0x9e
 
 //ON WIFI
-#define MY_DEST_MAC0	0x00
-#define MY_DEST_MAC1	0x19
-#define MY_DEST_MAC2	0x7e
-#define MY_DEST_MAC3	0x24
-#define MY_DEST_MAC4	0xe4
-#define MY_DEST_MAC5	0x0c
 
 #define ETHER_TYPE	0x0800
 
- // #define DEFAULT_IF	"eth0" 
-#define DEFAULT_IF	"wlan0"
-// #define DEFAULT_IF	"enp3s0f2"
-// #define DEFAULT_IF  "wlp2s0f0"
-
+#define DEFAULT_IF	"eth0" 
+// #define DEFAULT_IF	"wlan0"
 #define BUF_SIZ		1024
 
 void sendPacket(long, long, long, long, long, long, char*);
@@ -211,22 +205,22 @@ int recievePacket(){
 	
 		/* Check the packet is for me */
 		// printf("recieved IP: %s:%s:%s:%s:%s:%s\n", eh->ether_dhost[0]);
-		if (eh->ether_dhost[0] == MY_DEST_MAC0 &&
-				eh->ether_dhost[1] == MY_DEST_MAC1 &&
-				eh->ether_dhost[2] == MY_DEST_MAC2 &&
-				eh->ether_dhost[3] == MY_DEST_MAC3 &&
-				eh->ether_dhost[4] == MY_DEST_MAC4 &&
-				eh->ether_dhost[5] == MY_DEST_MAC5) {
+		if (eh->ether_dhost[0] == MY_MAC0 &&
+				eh->ether_dhost[1] == MY_MAC1 &&
+				eh->ether_dhost[2] == MY_MAC2 &&
+				eh->ether_dhost[3] == MY_MAC3 &&
+				eh->ether_dhost[4] == MY_MAC4 &&
+				eh->ether_dhost[5] == MY_MAC5) {
 			printf("\nCorrect destination MAC address\n");
 			printf("\tlistener: got packet %zd bytes\n", numbytes);
 		} else {
-			printf("Wrong destination MAC: %02x:%02x:%02x:%02x:%02x:%02x\n",
-							eh->ether_dhost[0],
-							eh->ether_dhost[1],
-							eh->ether_dhost[2],
-							eh->ether_dhost[3],
-							eh->ether_dhost[4],
-							eh->ether_dhost[5]);
+			// printf("Wrong destination MAC: %02x:%02x:%02x:%02x:%02x:%02x\n",
+							// eh->ether_dhost[0],
+							// eh->ether_dhost[1],
+							// eh->ether_dhost[2],
+							// eh->ether_dhost[3],
+							// eh->ether_dhost[4],
+							// eh->ether_dhost[5]);
 			ret = -1;
 			continue;
 		}
