@@ -45,7 +45,7 @@ class Client:
 			print "Protocol: "+ protocol
 			print "Out: " + receivedPacket[14:] + "\n\n\n"
 		if not self.registered:
-			print receivedPacket[14:22]
+			#print receivedPacket[14:22]
 			if(receivedPacket[14:22] == "Accepted"):
 				self.registered = True;
 				self.homeAdd = ethrheader[1]
@@ -59,9 +59,12 @@ class Client:
 				print "Registering on Network"
 				self.sendPayload("\xFF\xFF\xFF\xFF\xFF\xFF", ("CheckIn"+binascii.hexlify(self.myAdd)))
 				if self.listen(False):
-					return
+					if self.registered:
+						return
+					else:
+						pass
 				else:
-					print "Sleeping"
+					#print "Sleeping"
 					pass
 				time.sleep(sleepTime) 
 			except KeyboardInterrupt:
@@ -98,9 +101,9 @@ class Client:
 		while True:
 			try:
 				chkString = self.listen(False, 50);
-				# print "CheckString = " + chkString
+				print "Recieved: " + chkString
 				if chkString[0:7]!="CheckUp"[0:7]:
-					print "Recieved: "+ chkString
+					#print "Recieved: "+ chkString
 					self.sendPayload(self.homeAdd, "Received")
 					pass
 				else:
@@ -141,7 +144,7 @@ class Client:
 		self.dev = inDev
 		# print binascii.unhexlify(binascii.hexlify("\x00\x1b\x24\x07\x57\x9e"))
 		self.myAdd = self.getHwAddr(inDev)
-		print self.myAdd
+		#print self.myAdd
 		self.registered = False
 		self.register(1)
 		# self.answerCheck()
@@ -158,7 +161,7 @@ class Client:
 		# thread.start()
 
 
-		print self.homeAdd
+		# :print self.homeAdd
 		# app.debug = True
 		# print binascii.hexlify("\x78\x24\xaf\x10\x34\x44");
 	# 
@@ -180,4 +183,4 @@ class Client:
 			# print "Successfull: " + str(success) + "/" + str(total) + "\n"
 			# print "fail: " + str(fail) + "/" + str(total) + "\n\n\n\n"
 if __name__ == '__main__':
-	Client("eth0")
+	Client("eth1")
