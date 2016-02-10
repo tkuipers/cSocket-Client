@@ -3,10 +3,9 @@ import struct
 import sys,os
 import socket
 import binascii
-import threading
+from multiprocessing  import Process
 import time 
 import fcntl
-from multiprocessing import Process
 
 
 class Client:
@@ -138,27 +137,30 @@ class Client:
 		s.send(dst_addr+src_addr+ethertype+payload)
 	
 	def __init__(self, inDev):
-		self.dev = inDev
-		# print binascii.unhexlify(binascii.hexlify("\x00\x1b\x24\x07\x57\x9e"))
-		self.myAdd = self.getHwAddr(inDev)
-		print self.myAdd
-		self.registered = False
-		self.register(1)
-		# self.answerCheck()
-		pollCheckThread = Process(target=self.answerCheck)
-		# thread.daemon = True
-		pollCheckThread.start()
-
-		listenForInput = Process(target=self.listenForInput)
-		# thread.daemon = True
-		listenForInput.start()
-
-		# thread = threading.Thread(target=self.listenForInput)
-		# thread.daemon = True
-		# thread.start()
-
-
-		print self.homeAdd
+		try:
+			self.dev = inDev
+			# print binascii.unhexlify(binascii.hexlify("\x00\x1b\x24\x07\x57\x9e"))
+			self.myAdd = self.getHwAddr(inDev)
+			print self.myAdd
+			self.registered = False
+			self.register(1)
+			# self.answerCheck()
+			pollCheckThread = Process(target=self.answerCheck)
+			# thread.daemon = True
+			pollCheckThread.start()
+			listenForInput = Process(target=self.listenForInput)
+			# thread.daemon = True
+			listenForInput.start()
+			# thread = threading.Thread(target=self.listenForInput)
+			# thread.daemon = True
+			# thread.start()
+			print self.homeAdd
+		except KeyboardInterrupt:
+			notifier.stop()
+			pollCheckThread.terminate()
+			listenForInput.terminate()
+			print 'KeyboardInterrupt caught'
+			raise
 		# app.debug = True
 		# print binascii.hexlify("\x78\x24\xaf\x10\x34\x44");
 	# 
