@@ -50,8 +50,11 @@ class Client:
 				print "Accepted into network"
 				self.registered = True;
 				self.homeAdd = ethrheader[1]
-		if destinationIP == binascii.hexlify(self.myAdd): #"\x00\x1b\x24\x07\x57\x9e"):
-			return receivedPacket[14:];
+		try:
+			if destinationIP == binascii.hexlify(self.myAdd): #"\x00\x1b\x24\x07\x57\x9e"):
+				return receivedPacket[14:];
+		except Exception as inst:
+			pass
 	
 	
 	def register(self, sleepTime):
@@ -119,8 +122,8 @@ class Client:
 				print inst
 				pass
 
-	def sendSocket(self, myAdd, homeAdd, dev):
-		sendPayload(myAdd, homeAdd, dev, "Received")
+	# def sendSocket(self, myAdd, homeAdd, dev):
+		# sendPayload(myAdd, homeAdd, dev, "Received")
 	
 	
 	def sendPayload(self, destAdd, msg):
@@ -184,4 +187,5 @@ class Client:
 			# print "Successfull: " + str(success) + "/" + str(total) + "\n"
 			# print "fail: " + str(fail) + "/" + str(total) + "\n\n\n\n"
 if __name__ == '__main__':
-	Client("eth0")
+	# Client("eth0")
+	Client("wlan0")
