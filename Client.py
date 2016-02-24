@@ -22,8 +22,8 @@ class Client:
 		return info[18:24]
 
 
-	def listen(self, printInfo=False, timeout=1.2):
-		rawSocket=socket.socket(socket.PF_PACKET,socket.SOCK_RAW,socket.htons(0x0800))
+	def listen(self, printInfo=False, timeout=7):
+		rawSocket=socket.socket(socket.PF_PACKET,socket.SOCK_RAW,socket.htons(0x0003))
 		# rawSocket.bind(("eth0", 0))
 		rawSocket.bind((self.dev, 0))
 		rawSocket.settimeout(timeout)
@@ -54,6 +54,7 @@ class Client:
 			if destinationIP == binascii.hexlify(self.myAdd): #"\x00\x1b\x24\x07\x57\x9e"):
 				return receivedPacket[14:];
 		except Exception as inst:
+			print "Excewpt 1"
 			pass
 	
 	
@@ -61,14 +62,15 @@ class Client:
 		while True:
 			try:
 				print "Registering on Network"
-				self.sendPayload("\xFF\xFF\xFF\xFF\xFF\xFF", ("CheckIn"+binascii.hexlify(self.myAdd)))
+				self.sendPayload("\xFF\xFF\xFF\xFF\xFF\xFF", ("CheckIn"+binascii.hexlify(self.myAdd)+ binascii.hexlify(str(self.idNum))))
 				if self.listen(False):
 					if self.registered:
 						return
 					else:
+						# print "Excewpt 2"
 						pass
 				else:
-					#print "Sleeping"
+					# print "Excewpt 3"
 					pass
 				time.sleep(sleepTime) 
 			except KeyboardInterrupt:
@@ -76,6 +78,7 @@ class Client:
 				print 'KeyboardInterrupt caught'
 				raise
 			except Exception as inst:
+				print "Excewpt 2"
 				print inst
 				pass
 			
@@ -85,7 +88,7 @@ class Client:
 			try:
 				chkString = self.listen(False, 50);
 				# print "CheckString = " + chkString
-				if chkString[0:7]=="CheckUp"[0:7]:
+				if chkString and chkString[0:7]=="CheckUp"[0:7]:
 					print "Recieved polling signal"
 					self.sendPayload(self.homeAdd, "Here")
 					pass
@@ -98,6 +101,7 @@ class Client:
 				print 'KeyboardInterrupt caught'
 				raise
 			except Exception as inst:
+				print "Excewpt 3"
 				print inst
 				pass
 
@@ -105,8 +109,9 @@ class Client:
 		while True:
 			try:
 				chkString = self.listen(False, 50);
-				print "Recieved: " + chkString
-				if chkString[0:7]!="CheckUp"[0:7]:
+				if chkString:
+					print "Recieved: " + chkString
+				if chkString and chkString[0:7]!="CheckUp"[0:7]:
 					#print "Recieved: "+ chkString
 					self.sendPayload(self.homeAdd, "Received")
 					pass
@@ -119,6 +124,7 @@ class Client:
 				print 'KeyboardInterrupt caught'
 				raise
 			except Exception as inst:
+				print "Excewpt 4"
 				print inst
 				pass
 
@@ -144,7 +150,8 @@ class Client:
 		print "sending: " + dst_addr+src_addr+binascii.hexlify(ethertype)+payload;
 		s.send(dst_addr+src_addr+ethertype+payload)
 	
-	def __init__(self, inDev):
+	def __init__(self, inDev, inID):
+		self.idNum = inID;
 		self.dev = inDev
 		# print binascii.unhexlify(binascii.hexlify("\x00\x1b\x24\x07\x57\x9e"))
 		self.myAdd = self.getHwAddr(inDev)
@@ -187,5 +194,5 @@ class Client:
 			# print "Successfull: " + str(success) + "/" + str(total) + "\n"
 			# print "fail: " + str(fail) + "/" + str(total) + "\n\n\n\n"
 if __name__ == '__main__':
-	# Client("eth0")
-	Client("wlan0")
+	Client("eth0", 2)
+	# Client("wlan0")
