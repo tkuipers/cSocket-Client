@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import json
 import struct
 import sys,os
 import socket
@@ -6,6 +7,7 @@ import binascii
 import threading
 import time 
 import fcntl
+from difflib import Differ
 from multiprocessing import Process
 
 
@@ -17,7 +19,7 @@ class Client:
 	#homeAdd the MAC of the server (only initialized if I'm registered)
 	@staticmethod
 	def getHwAddr(ifname):
-		temp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		temp = socket.socket(socket.AF_NETLINK, socket.SOCK_DGRAM)
 		info = fcntl.ioctl(temp.fileno(), 0x8927,  struct.pack('256s', ifname[:15]))
 		return info[18:24]
 
@@ -53,8 +55,10 @@ class Client:
 		try:
 			if destinationIP == binascii.hexlify(self.myAdd): #"\x00\x1b\x24\x07\x57\x9e"):
 				return receivedPacket[14:];
+			else:
+				binascii.unhexlify(destinationIP);
 		except Exception as inst:
-			print "Excewpt 1"
+			print "Except 1"
 			pass
 	
 	
@@ -105,20 +109,19 @@ class Client:
 				print inst
 				pass
 
+
 	def listenForInput(self):
 		while True:
 			try:
 				chkString = self.listen(False, 50);
 				if chkString:
-					print "Recieved: " + chkString
+					print "Recieved: \"" + chkString + "\""	
 				if chkString and chkString[0:7]!="CheckUp"[0:7]:
-					#print "Recieved: "+ chkString
+					chkString = chkString.rstrip('\x00')
 					self.sendPayload(self.homeAdd, "Received")
-					pass
+					print json.loads(chkString)
 				else:
 					pass
-					# print "Recieved" + " != " + chkString
-					# print str(type("CheckUp")) + " != " + str(type(chkString))
 			except KeyboardInterrupt:
 				notifier.stop()
 				print 'KeyboardInterrupt caught'
@@ -194,5 +197,5 @@ class Client:
 			# print "Successfull: " + str(success) + "/" + str(total) + "\n"
 			# print "fail: " + str(fail) + "/" + str(total) + "\n\n\n\n"
 if __name__ == '__main__':
-	Client("eth0", 2)
+	Client("enp3s0f2", 2)
 	# Client("wlan0")
